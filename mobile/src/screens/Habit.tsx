@@ -7,6 +7,7 @@ import { CheckBox } from "../components/CheckBox";
 import { useEffect, useState } from "react";
 import { Loading } from "../components/Loading";
 import { api } from "../lib/axios";
+import { generateProgressPercentage } from '../../utils/generate-progess-percentage'
 
 interface Params {
     date: string;
@@ -49,6 +50,16 @@ export function Habit() {
         }
     }
 
+    const habitsProgress = dayInfo?.possibleHabits.length ? generateProgressPercentage(dayInfo.possibleHabits.length, completedHabits.length) : 0;
+
+    async function handleToggleHabit(habitId: string) {
+        if (completedHabits.includes(habitId)){
+            setCompletedHabits(prevState => prevState.filter(habit => habit != habitId));
+        }else{
+            setCompletedHabits(prevState => [...prevState, habitId]);
+        }
+    }
+
     useEffect(() => {
         fetchHabits();
     },[])
@@ -77,7 +88,7 @@ export function Habit() {
                     {dayAndMonth}
                 </Text>
 
-                <ProgressBar progress={50}/>
+                <ProgressBar progress={habitsProgress}/>
 
                 <View className="mt-6">
                     {
@@ -87,6 +98,7 @@ export function Habit() {
                                 key={habit.id}
                                 title={habit.title}
                                 checked={completedHabits.includes(habit.id)}
+                                onPress= {() => handleToggleHabit(habit.id)}
                             />
                         ))
                         
